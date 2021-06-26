@@ -15,28 +15,28 @@ namespace ConsoleEShop.Pages
             
         }
 
-        public override Dictionary<string, Action> SetCommands()
+        public override Dictionary<string, Func<string>> SetCommands()
         {
             switch (context.CurrentUser.Role)
             {
                 case Roles.Guest:
-                    return new Dictionary<string, Action>();
+                    return new Dictionary<string, Func<string>>();
                 case Roles.RegisteredUser:
-                    return new Dictionary<string, Action>();
+                    return new Dictionary<string, Func<string>>();
                 case
                     Roles.Administrator:
                 {
-                    return new Dictionary<string, Action>
+                    return new Dictionary<string, Func<string>>
                     {
-                        {"product", () => ShowProduct(Param)},
-                        {"products", ShowAllProducts},
-                        {"cart", ShowMyCart},
+                        {"product", () => ShowProductPage(Param)},
+                        {"products", ShowAllProductsPage},
+                        {"cart", ShowMyCartPage},
                         {"orders", ShowMyOrdersPage},
                         {"logout", Logout},
-                        {"user info", ShowMyInfo},
-                        {"m users", ManageUsers},
-                        {"m orders", ManageOrders},
-                        {"m products", ManageProducts},
+                        {"user info", ShowMyInfoPage},
+                        {"m users", ShowManageUsersPage},
+                        {"m orders", ShowManageOrdersPage},
+                        {"m products", ShowManageProductsPage},
                         {"name",SetProductName},
                         {"price",SetProductPrice},
                         {"category", SetProductCategory},
@@ -45,23 +45,23 @@ namespace ConsoleEShop.Pages
 
                     };
                 }
-                  default: return new Dictionary<string, Action>();
+                  default: return new Dictionary<string, Func<string>>();
             }
         }
 
-        private void AddNewProduct()
+        private string AddNewProduct()
         {
             var name = communicator.AskForString("Please enter name of new product:", "name",3);
             if (string.IsNullOrWhiteSpace(name))
             {
-                AbortOperation();
-                return;
+                ShowWelcomeInfo();
+                return "Operation canceled";
             }
             var price = (decimal)communicator.AskForNumber("Please enter price of new product:");
             if (price < 1)
             {
-                AbortOperation();
-                return;
+                ShowWelcomeInfo();
+                return "Operation canceled";
             }
             ioService.Highlight("List of categories:");
             var categories = dataService.GeAllCategories().ToArray();
@@ -74,14 +74,14 @@ namespace ConsoleEShop.Pages
             var categoryId = communicator.AskForNumber("Please enter desired No for category", categories.Length);
             if (categoryId<1)
             {
-                AbortOperation();
-                return;
+                ShowWelcomeInfo();
+                return "Operation canceled";
             }
             var desctription = communicator.AskForString("Please enter description for new product:", "desctription", 3);
             if (string.IsNullOrWhiteSpace(desctription))
             {
-                AbortOperation();
-                return;
+                ShowWelcomeInfo();
+                return "Operation canceled";
             }
             var product = new Product()
             {
@@ -92,17 +92,17 @@ namespace ConsoleEShop.Pages
             };
             dataService.AddNewProduct(product);
             ShowWelcomeInfo();
-            ioService.Highlight("Product added successfuly");
+            return "Product added successfuly";
             
         }
 
-        private void SetProductDescription()
+        private string SetProductDescription()
         {
             var product = SelectProduct();
             if (product is null)
             {
-                AbortOperation();
-                return;
+                ShowWelcomeInfo();
+                return "Operation canceled";
             }
 
             var newDesctiption = communicator.AskForString("Please enter desired new name", "descripion", 3);
@@ -113,19 +113,20 @@ namespace ConsoleEShop.Pages
                 product.Description = newDesctiption;
                 dataService.UpdateProduct(product);
                 ShowWelcomeInfo();
-                ioService.Highlight("Name changed successfuly");
-                return;
+                return "Name changed successfuly";
+                
             }
-            AbortOperation();
+            ShowWelcomeInfo();
+            return "Operation canceled";
         }
 
-        private void SetProductCategory()
+        private string SetProductCategory()
         {
             var product = SelectProduct();
             if (product is null)
             {
-                AbortOperation();
-                return;
+                ShowWelcomeInfo();
+                return "Operation canceled";
             }
 
             var categories = dataService.GeAllCategories().ToArray();
@@ -143,19 +144,20 @@ namespace ConsoleEShop.Pages
                 product.CategoryId = categories[newCategoryNo].Id;
                 dataService.UpdateProduct(product);
                 ShowWelcomeInfo();
-                ioService.Highlight("Name changed successfuly");
-                return;
+                return "Name changed successfuly";
+                
             }
-            AbortOperation();
+            ShowWelcomeInfo();
+            return "Operation canceled";
         }
 
-        private void SetProductPrice()
+        private string SetProductPrice()
         {
             var product = SelectProduct();
             if (product is null)
             {
-                AbortOperation();
-                return;
+                ShowWelcomeInfo();
+                return "Operation canceled";
             }
 
             var newPrice = communicator.AskForNumber("Please enter desired new price");
@@ -166,20 +168,20 @@ namespace ConsoleEShop.Pages
                 product.Price = newPrice;
                 dataService.UpdateProduct(product);
                 ShowWelcomeInfo();
-                ioService.Highlight("Price changed successfuly");
-                return;
+                return "Price changed successfuly";
+               
             }
-            AbortOperation();
-
+            ShowWelcomeInfo();
+            return "Operation canceled";
         }
 
-        private void SetProductName()
+        private string SetProductName()
         {
             var product = SelectProduct();
             if (product is null)
             {
-                AbortOperation();
-                return;
+                ShowWelcomeInfo();
+                return "Operation canceled";
             }
 
             var newName = communicator.AskForString("Please enter desired new name", "name", 3);
@@ -190,24 +192,18 @@ namespace ConsoleEShop.Pages
                 product.Name = newName;
                 dataService.UpdateProduct(product);
                 ShowWelcomeInfo();
-                ioService.Highlight("Name changed successfuly");
-                return;
+                return "Name changed successfuly";
             }
-            AbortOperation();
+            ShowWelcomeInfo();
+            return "Operation canceled";
         }
 
-        public override IView ShowPageData()
+        public IView ShowPageData()
         {
 
 
             Products = dataService.GetProducts().ToList();
             return new ProductsView(Products);
-            
-            //ioService.Highlight($"№  - Название{new string(' ', 22)}Цена");
-            //foreach (var product in Products)
-            //{
-            //    ioService.Write($"{product.Id:D2} - {product.Name}{new string(' ', 30 - product.Name.Length)}{product.Price}");
-            //}
 
         }
 

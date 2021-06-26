@@ -29,6 +29,8 @@ namespace ConsoleEShop
             client.RequestRecieved +=Handle;
 
             SetCurrentPage(new HomePage(ioService, dataService, client));
+            
+            client.Response(currentPage.ShowPageData());
         }
 
  
@@ -45,20 +47,20 @@ namespace ConsoleEShop
                 return;
             }
             CurrentUser = user;
+            SetCart();
+          currentPage.Commands= currentPage.SetCommands();
         }
         public void SetCurrentPage(IPage page)
         {
             currentPage = page ?? throw new ArgumentNullException(nameof(page));
             currentPage.SetContext(this);
             currentPage.Commands=  currentPage.SetCommands();
-            currentPage.ShowWelcomeInfo();
         }
 
      
         public void Handle(object? sender, ClientRequestArgs args)
         {
           
-            
             string param = null;
             string command = args.Command;
             if (!currentPage.Commands.ContainsKey(args.Command))
@@ -66,13 +68,14 @@ namespace ConsoleEShop
                 var complexCheck = CheckComplexRequest(args.Command, out command, out param);
                 if (!complexCheck)
                 {
-                    currentPage.ShowErrorMessage("there is no such command");
+                    client.Response("there is no such command");
                     return;
                 }
             }
 
             currentPage.Param = param;
-            currentPage.Commands[command].Invoke();
+           
+            client.Response(currentPage.Commands[command].Invoke()); 
         }
 
         private bool CheckComplexRequest(string request, out string command, out string param)

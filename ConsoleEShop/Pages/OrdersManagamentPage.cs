@@ -14,45 +14,45 @@ namespace ConsoleEShop.Pages
             
         }
 
-        public override Dictionary<string, Action> SetCommands()
+        public override Dictionary<string, Func<string>> SetCommands()
         {
             switch (context.CurrentUser.Role)
             {
                 case Roles.Guest:
-                    return new Dictionary<string, Action>();
+                    return new Dictionary<string, Func<string>>();
                 case Roles.RegisteredUser:
-                    return new Dictionary<string, Action>();
+                    return new Dictionary<string, Func<string>>();
                 case
                     Roles.Administrator:
                     {
-                        return new Dictionary<string, Action>
+                        return new Dictionary<string, Func<string>>
                     {
-                        {"product", () => ShowProduct(Param)},
-                        {"products", ShowAllProducts},
-                        {"cart", ShowMyCart},
+                        {"product", () => ShowProductPage(Param)},
+                        {"products", ShowAllProductsPage},
+                        {"cart", ShowMyCartPage},
                         {"orders", ShowMyOrdersPage},
                         {"logout", Logout},
-                        {"user info", ShowMyInfo},
-                        {"m users", ManageUsers},
-                        {"m orders", ManageOrders},
-                        {"m products", ManageProducts},
+                        {"user info", ShowMyInfoPage},
+                        {"m users", ShowManageUsersPage},
+                        {"m orders", ShowManageOrdersPage},
+                        {"m products", ShowManageProductsPage},
                         {"status",SetOrderStatus},
 
                     };
                     }
                     default:
-                        return new Dictionary<string, Action>();
+                        return new Dictionary<string, Func<string>>();
                         
             }
         }
 
-        private void SetOrderStatus()
+        private string SetOrderStatus()
         {
             var order = SelectOrder();
             if (order is null)
             {
-                AbortOperation();
-                return;
+                ShowWelcomeInfo();
+                return "Operation canceled";
             }
 
             ioService.Highlight("Please enter № of status :");
@@ -62,7 +62,7 @@ namespace ConsoleEShop.Pages
             ioService.Write($"{03} - {OrderStatus.Sent}");
             ioService.Write($"{04} - {OrderStatus.Finished}");
 
-            var newStatusNo = communicator.AskForNumber("Please enter desired new name", 4);
+            var newStatusNo = communicator.AskForNumber("Please enter No of new status", 4);
 
             if (newStatusNo > 0)
             {
@@ -86,10 +86,11 @@ namespace ConsoleEShop.Pages
                 }
                 dataService.UpdateOrderStatus(order);
                 ShowWelcomeInfo();
-                ioService.Highlight("Status changed successfuly");
-                return;
+                return "Status changed successfuly";
+                
             }
-            AbortOperation();
+            ShowWelcomeInfo();
+            return "Operation canceled";
         }
         public Order SelectOrder()
         {
@@ -97,23 +98,10 @@ namespace ConsoleEShop.Pages
             return number > 0 ? Orders[number - 1] : null;
         }
 
-        public override IView ShowPageData()
+        public IView ShowPageData()
         {
 
             return new OrdersView(dataService.GetOrders(),dataService);
-            //Orders = dataService.GetOrders().ToList();
-            //if (Orders.Count < 1)
-            //{
-            //    ioService.Write("There are no any orders");
-            //    return;
-            //}
-            //var index = 1;
-            //ioService.Highlight($"№   - Статус\t\tUser");
-            //foreach (var order in Orders)
-            //{
-            //    var user = dataService.GetUserById(order.UserId);
-            //    ioService.WriteInLine($"{index++:D2} - {order.Status}\t\t{user.Name}");
-            //}
         }
     }
 }

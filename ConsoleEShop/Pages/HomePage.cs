@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using ConsoleEShop.Views;
 using static ConsoleEShop.User;
 
@@ -9,13 +10,22 @@ namespace ConsoleEShop.Pages
     {
         public HomePage(IIOService ioService, IDataService dataService, IClient client) :base(ioService, dataService, client)
         {
-           
+            
         }
-        public override IView ShowPageData()
+
+        private bool firstTime = true;
+        
+        public IView ShowPageData()
         {
             
-            return new StringView("Home Page!");
-
+            if (firstTime)
+            {
+                firstTime = false;
+                var menu = new MenuView(context, Commands.Keys.ToList());
+                return new PageData(menu, ShowPageData());
+            }
+            return new StringView("Home Page");
+            
         }
         public override Dictionary<string, Func<string>> SetCommands()
         {
@@ -26,42 +36,42 @@ namespace ConsoleEShop.Pages
                         return new Dictionary<string, Func<string>>
                         {
                             {"register", Register},
-                            {"login", ()=> Login()},
-                            {"product", () => ShowProduct(Param)},
-                            {"products", ShowAllProducts},
+                            {"login", Login},
+                            {"product", () => ShowProductPage(Param)},
+                            {"products", ShowAllProductsPage},
                         };
                     }
-                    break;
+                    
                 case Roles.RegisteredUser:
                     {
                         return new Dictionary<string, Func<string>>
                         {
-                            {"product", () => ShowProduct(Param)},
-                            {"products", ShowAllProducts},
-                            {"cart", ShowMyCart},
+                            {"product", () => ShowProductPage(Param)},
+                            {"products", ShowAllProductsPage},
+                            {"cart", ShowMyCartPage},
                             {"logout", Logout},
                             {"orders", ShowMyOrdersPage},
-                            {"user info", ShowMyInfo}
+                            {"user info", ShowMyInfoPage}
                         };
                     }
-                    break;
+                   
                 case
                     Roles.Administrator:
                     {
                         return new Dictionary<string, Func<string>>
                         {
-                            {"product", () => ShowProduct(Param)},
-                            {"products", ShowAllProducts},
-                            {"cart", ShowMyCart},
+                            {"product", () => ShowProductPage(Param)},
+                            {"products", ShowAllProductsPage},
+                            {"cart", ShowMyCartPage},
                             {"logout", Logout},
                             {"orders", ShowMyOrdersPage},
-                            {"user info", ShowMyInfo},
-                            {"m users", ManageUsers},
-                            {"m orders", ManageOrders},
-                            {"m products", ManageProducts}
+                            {"user info", ShowMyInfoPage},
+                            {"m users", ShowManageUsersPage},
+                            {"m orders", ShowManageOrdersPage},
+                            {"m products", ShowManageProductsPage}
                         };
                     }
-                    break;
+                    
                 default:
                     return new Dictionary<string, Func<string>>();
             }

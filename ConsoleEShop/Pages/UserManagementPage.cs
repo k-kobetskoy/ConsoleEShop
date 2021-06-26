@@ -14,28 +14,28 @@ namespace ConsoleEShop.Pages
            
         }
 
-        public override Dictionary<string, Action> SetCommands()
+        public override Dictionary<string, Func<string>> SetCommands()
         {
             switch (context.CurrentUser.Role)
             {
                 case Roles.Guest:
-                    return new Dictionary<string, Action>();
+                    return new Dictionary<string, Func<string>>();
                 case Roles.RegisteredUser:
-                    return new Dictionary<string, Action>();
+                    return new Dictionary<string, Func<string>>();
                 case
                     Roles.Administrator:
                     {
-                        return new Dictionary<string, Action>
+                        return new Dictionary<string, Func<string>>
                     {
-                        {"product", () => ShowProduct(Param)},
-                        {"products", ShowAllProducts},
-                        {"cart", ShowMyCart},
+                        {"product", () => ShowProductPage(Param)},
+                        {"products", ShowAllProductsPage},
+                        {"cart", ShowMyCartPage},
                         {"orders", ShowMyOrdersPage},
                         {"logout", Logout},
-                        {"user info", ShowMyInfo},
-                        {"m users", ManageUsers},
-                        {"m orders", ManageOrders},
-                        {"m products", ManageProducts},
+                        {"user info", ShowMyInfoPage},
+                        {"m users", ShowManageUsersPage},
+                        {"m orders", ShowManageOrdersPage},
+                        {"m products", ShowManageProductsPage},
                         {"name",SetUserName},
                         {"pass",SetUserPassword},
                         {"role", SetUserRole},
@@ -43,38 +43,20 @@ namespace ConsoleEShop.Pages
                     };
                     }
                 default:
-                    return new Dictionary<string, Action>();
+                    return new Dictionary<string, Func<string>>();
                     
             }
         }
 
-        public override IView ShowPageData()
+        public IView ShowPageData()
         {
             Users = dataService.GetAllUsers().ToList();
 
             return new UsersView(Users);
-            
-            
-            
-            //if (Users.Count < 1)
-            //{
-            //    ioService.Write("There are no users to show");
-            //    return;
-            //}
-
-            //ioService.Highlight($"№    Имя{new string(' ', 22)} Роль \t\tПароль");
-
-            //var index = 1;
-            //foreach (var user in Users)
-            //{
-            //    ioService.Write($"{index++:D2} - {user.Name}{new string(' ', 24 - user.Name.Length)}" +
-            //                    $"{user.Role}{new string(' ', 15 - user.Role.ToString().Length)}" +
-            //                    $"\t{user.Password}");
-            //}
         }
 
 
-        public void SetUserName()
+        public string SetUserName()
         {
             var number = communicator.AskForNumber("Please enter user's index wich name you want to change", Users.Count);
             if (number > 0)
@@ -87,15 +69,15 @@ namespace ConsoleEShop.Pages
                     user.Name = newName;
                     dataService.UpdateUserName(user);
                     ShowWelcomeInfo();
-                    ioService.Highlight("Name changed successfuly");
-                    return;
+                    return "Name changed successfuly";
                 }
             }
 
-            AbortOperation();
+            ShowWelcomeInfo();
+            return "Operation canceled";
 
         }
-        public void SetUserPassword()
+        public string SetUserPassword()
         {
             var number = communicator.AskForNumber("Please enter user's index wich password you want to change", Users.Count);
             if (number > 0)
@@ -108,14 +90,15 @@ namespace ConsoleEShop.Pages
                     user.Password = newPass;
                     dataService.UpdateUserPassword(user);
                     ShowWelcomeInfo();
-                    ioService.Highlight("PAssword set successfuly");
-                    return;
+                    return "Password set successfuly";
+                    
                 }
             }
 
-            AbortOperation();
+            ShowWelcomeInfo();
+            return "Operation canceled";
         }
-        public void SetUserRole()
+        public string SetUserRole()
         {
             var number = communicator.AskForNumber("Please enter user's index wich role you want to change");
             if (number > 0 && number <= Users.Count)
@@ -132,12 +115,13 @@ namespace ConsoleEShop.Pages
                     user.Role = (Roles) roleNumber;
                     dataService.UpdateUserRole(user);
                     ShowWelcomeInfo();
-                    ioService.Highlight("Role set successfuly");
-                    return;
+                    return "Role set successfuly";
+                    
                 }
             }
 
-            AbortOperation();
+            ShowWelcomeInfo();
+            return "Operation canceled";
         }
 
 

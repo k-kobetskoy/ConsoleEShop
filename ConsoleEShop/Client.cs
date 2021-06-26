@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using ConsoleEShop.Views;
 
 namespace ConsoleEShop
 {
@@ -12,6 +13,7 @@ namespace ConsoleEShop
         event EventHandler<ClientRequestArgs> RequestRecieved;
         void Response(string response);
         string ReadOrAbort();
+        void Response(IView responce);
     }
 
     public class ClientRequestArgs : EventArgs
@@ -93,8 +95,15 @@ namespace ConsoleEShop
         }
 
 
+        public void Response(IView responce)
+        {
+           ioService.Clear();
+            ioService.Write(responce.ShowViewData());
+        }
+
         public void Response(string response)
         {
+            ioService.Clear();
             ioService.Write(response);
         }
 

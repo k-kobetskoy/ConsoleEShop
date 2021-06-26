@@ -17,59 +17,64 @@ namespace ConsoleEShop.Pages
 
            
         }
-        public override Dictionary<string, Action> SetCommands()
+        public override Dictionary<string, Func<string>> SetCommands()
         {
             switch (context.CurrentUser.Role)
             {
                 case Roles.Guest:
                 {
-                    return new Dictionary<string, Action>
+                    return new Dictionary<string, Func<string>>
                     {
                         {"register", Register},
-                        {"login", ()=> Login()},
-                        {"product", () => ShowProduct(Param)},
-                        {"products", ShowAllProducts},
+                        {"login", Login},
+                        {"product", () => ShowProductPage(Param)},
+                        {"products", ShowAllProductsPage},
                     };
                 }
                    
                 case Roles.RegisteredUser:
                 {
-                    return new Dictionary<string, Action>
+                    return new Dictionary<string, Func<string>>
                     {
-                        {"product", () => ShowProduct(Param)},
-                        {"products", ShowAllProducts},
-                        {"cart", ShowMyCart},
+                        {"product", () => ShowProductPage(Param)},
+                        {"products", ShowAllProductsPage},
+                        {"cart", ShowMyCartPage},
                         {"logout", Logout},
-                        {"user info", ShowMyInfo},
+                        {"user info", ShowMyInfoPage},
                         {"orders", ShowMyOrdersPage},
-                        {"byu", () => { AddToCart(product);}},
+                        {"byu", ()=>  AddToCart(product)},
                     };
                 }
                    
                 case
                     Roles.Administrator:
                 {
-                    return new Dictionary<string, Action>
+                    return new Dictionary<string, Func<string>>
                     {
-                        {"product", () => ShowProduct(Param)},
-                        {"products", ShowAllProducts},
-                        {"cart", ShowMyCart},
+                        {"product", () => ShowProductPage(Param)},
+                        {"products", ShowAllProductsPage},
+                        {"cart", ShowMyCartPage},
                         {"logout", Logout},
-                        {"user info", ShowMyInfo},
+                        {"user info", ShowMyInfoPage},
                         {"orders", ShowMyOrdersPage},
-                        {"m users", ManageUsers},
-                        {"m orders", ManageOrders},
-                        {"m products", ManageProducts},
-                        {"byu", () => { AddToCart(product);}},
+                        {"m users", ShowManageUsersPage},
+                        {"m orders", ShowManageOrdersPage},
+                        {"m products", ShowManageProductsPage},
+                        {"byu", () =>  AddToCart(product)},
                     };
                 }
                     
                 default:
-                    return new Dictionary<string, Action>();
+                    return new Dictionary<string, Func<string>>();
             }
         }
 
-        public override IView ShowPageData()
+        private string AddToCart(Product product)
+        {
+            return SetQuantity(product);
+        }
+
+        public IView ShowPageData()
         {
             return new ProductView(product);
         }

@@ -8,99 +8,95 @@ using static ConsoleEShop.User;
 
 namespace ConsoleEShop.Pages
 {
-   public class OrdersPage : BasePage, IPage
+    public class OrdersPage : BasePage, IPage
     {
         private List<Order> Orders { get; set; }
         public OrdersPage(IIOService ioService, IDataService dataService, IClient client) : base(ioService, dataService, client)
         {
-           
+
         }
 
-        public override Dictionary<string, Action> SetCommands()
+        public override Dictionary<string, Func<string>> SetCommands()
         {
             switch (context.CurrentUser.Role)
             {
                 case Roles.Guest:
-                    return new Dictionary<string, Action>();
+                    return new Dictionary<string, Func<string>>();
                 case Roles.RegisteredUser:
                     {
-                        return new Dictionary<string, Action>
-                    {
-                        {"product", () => ShowProduct(Param)},
-                        {"products", ShowAllProducts},
-                        {"cart", ShowMyCart},
-                        {"orders", ShowMyOrdersPage},
-                        {"logout", Logout},
-                        {"user info", ShowMyInfo},
-                        {"recieved", ()=>SetRecievedStatus(Orders)},
-                        {"cancel", CancelOrder}
-                    };
+                        return new Dictionary<string, Func<string>>
+                         {
+                             {"product", () => ShowProductPage(Param)},
+                             {"products", ShowAllProductsPage},
+                             {"cart", ShowMyCartPage},
+                             {"orders", ShowMyOrdersPage},
+                             {"logout", Logout},
+                             {"user info", ShowMyInfoPage},
+                             {"recieved", SetRecievedStatus},
+                             {"cancel", CancelOrder}
+                         };
                     }
-                    break;
+
                 case
                     Roles.Administrator:
                     {
-                        return new Dictionary<string, Action>
-                    {
-                        {"product", () => ShowProduct(Param)},
-                        {"products", ShowAllProducts},
-                        {"cart", ShowMyCart},
-                        {"orders", ShowMyOrdersPage},
-                        {"logout", Logout},
-                        {"user info", ShowMyInfo},
-                        {"m users", ManageUsers},
-                        {"m orders", ManageOrders},
-                        {"m products", ManageProducts},
-                        {"recieved", ()=>SetRecievedStatus(Orders)},
-                        {"cancel", CancelOrder}
-                    };
+                        return new Dictionary<string, Func<string>>
+                         {
+                             {"product", () => ShowProductPage(Param)},
+                             {"products", ShowAllProductsPage},
+                             {"cart", ShowMyCartPage},
+                             {"orders", ShowMyOrdersPage},
+                             {"logout", Logout},
+                             {"user info", ShowMyInfoPage},
+                             {"m users", ShowManageUsersPage},
+                             {"m orders", ShowManageOrdersPage},
+                             {"m products", ShowManageProductsPage},
+                             {"recieved", SetRecievedStatus},
+                             {"cancel", CancelOrder}
+                         };
                     }
-                    default:
-                        return new Dictionary<string, Action>();
+                default:
+                    return new Dictionary<string, Func<string>>();
             }
         }
 
 
-        public void CancelOrder()
+        public string CancelOrder()
         {
             var number = communicator.AskForNumber("Please enter No of order you want to cancel", Orders.Count);
-            if (number<1)
-            {
-                AbortOperation();
-                return;
-            }
+            if (number < 1)
+                return ShowWelcomeInfo("Operation canceled");
+              
+           
 
             var order = Orders[number - 1];
             order.Status = OrderStatus.CanceledByUser;
             dataService.UpdateOrderStatus(order);
-            ShowWelcomeInfo();
-            ioService.Highlight("Order was canceled");
+          return  ShowWelcomeInfo("Order was canceled");
         }
-        public override IView ShowPageData()
+
+        public string SetRecievedStatus()
+        {
+            if (!Orders.Any())
+                return  ShowWelcomeInfo("There is no orders");
+             
+            
+            var orderIndex = communicator.AskForNumber("Enter № of order you recieved", Orders.Count);
+            if (orderIndex < 1)
+                return ShowWelcomeInfo("Operation canceled");
+
+            var order = Orders[orderIndex - 1];
+            order.Status = OrderStatus.Recieved;
+            dataService.UpdateOrderStatus(order);
+          return  ShowWelcomeInfo("Status changed succesfuly");
+           
+        }
+
+
+        public IView ShowPageData()
         {
             Orders = dataService.GetUserOrders(context.CurrentUser.Id).OrderBy(o => o.OrderId)?.ToList();
-
             return new OrdersView(Orders, dataService);
-            
-            //if (Orders.Count < 1)
-            //{
-            //    ioService.Write("You dont have any orders yet");
-            //    return;
-            //}
-            //var index = 1;
-            //ioService.Highlight($"№  - Статус\t\tТовары");
-            //foreach (var order in Orders)
-            //{
-            //    ioService.WriteInLine($"{index++:D2} - {order.Status}\t\t");
-            //    var gap = 0;
-            //    foreach (var orderOrderItem in order.OrderItems)
-            //    {
-            //        var product = dataService.GetProductById(orderOrderItem.ProductId);
-            //        ioService.Write($"{new string(' ', gap)}{product.Name}(x{orderOrderItem.Quantity})\t");
-            //        gap = 24;
-            //    }
-            //}
-
         }
 
 

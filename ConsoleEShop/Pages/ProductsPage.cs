@@ -1,7 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.Serialization.Json;
 using System.Text;
+using ConsoleEShop.Models;
 using ConsoleEShop.Views;
 
 namespace ConsoleEShop.Pages
@@ -9,69 +11,104 @@ namespace ConsoleEShop.Pages
     public class ProductsPage:BasePage, IPage
     {
         private readonly List<Product> products;
-        public User CurrentUser { get; set; }
+       
         public ProductsPage(IIOService ioService, IDataService dataService, IClient client) : base(ioService, dataService,client)
         {
             products = dataService.GetProducts().ToList();
             
         }
 
-        public override Dictionary<string, Action> SetCommands()
+        public override Dictionary<string, Func<string>> SetCommands()
         {
-            CurrentUser = context.CurrentUser;
             
-            switch (CurrentUser.Role)
+            
+            switch (context.CurrentUser.Role)
             {
                 case Roles.Guest:
                 {
-                    return new Dictionary<string, Action>
+                    return new Dictionary<string, Func<string>>
                     {
                         {"register", Register},
                         {"login",()=> Login()},
-                        {"product", () => ShowProduct(Param)},
-                        {"products", ShowAllProducts},
+                        {"product", () => ShowProductPage(Param)},
+                        {"products", ShowAllProductsPage},
                     };
                 }
                     
                 case Roles.RegisteredUser:
                 {
-                    return new Dictionary<string, Action>
+                    return new Dictionary<string, Func<string>>
                     {
-                        {"product", () => ShowProduct(Param)},
-                        {"products", ShowAllProducts},
-                        {"cart", ShowMyCart},
+                        {"product", () => ShowProductPage(Param)},
+                        {"products", ShowAllProductsPage},
+                        {"cart", ShowMyCartPage},
                         {"orders", ShowMyOrdersPage},
                         {"logout", Logout},
-                        {"user info", ShowMyInfo},
-                        {"byu", () => { AddToCart(Param);}},
+                        {"user info", ShowMyInfoPage},
+                        {"byu", ()=> AddToCart(Param)}
                     };
                 }
                     
                 case
                     Roles.Administrator:
                 {
-                    return new Dictionary<string, Action>
+                    return new Dictionary<string, Func<string>>
                     {
-                        {"product", () => ShowProduct(Param)},
-                        {"products", ShowAllProducts},
-                        {"cart", ShowMyCart},
+                        {"product", () => ShowProductPage(Param)},
+                        {"products", ShowAllProductsPage},
+                        {"cart", ShowMyCartPage},
                         {"orders", ShowMyOrdersPage},
                         {"logout", Logout},
-                        {"user info", ShowMyInfo},
-                        {"m users", ManageUsers},
-                        {"m orders", ManageOrders},
-                        {"m products", ManageProducts},
-                        {"byu", () => { AddToCart(Param);}},
+                        {"user info", ShowMyInfoPage},
+                        {"m users", ShowManageUsersPage},
+                        {"m orders", ShowManageOrdersPage},
+                        {"m products", ShowManageProductsPage},
+                        {"byu", () =>  AddToCart(Param)},
                     };
                 }
                     
                 default:
-                    return new Dictionary<string, Action>();
+                    return new Dictionary<string, Func<string>> ();
                     
             }
         }
 
-        public override IView ShowPageData()
+
+        public string AddToCart(string index = null)
+        {
+            if (string.IsNullOrWhiteSpace(index))
+                index = AskCartItemIndex();
+
+            var parseResult = int.TryParse(index, out var productIndex);
+            if (!parseResult)
+                return AddToCart();
+
+
+            if (productIndex>products.Count)
+            {
+                ShowWelcomeInfo();
+                return "There is no product with such index";
+            }
+
+            var product = products[productIndex - 1];
+            return SetQuantity(product);
+        }
+
+       
+        private string AskCartItemIndex()
+        {
+            var number = communicator.AskForNumber("Please enter product's index", products.Count);
+
+            if (number < 1)
+            {
+                ShowWelcomeInfo();
+                return "Operation was canceled";
+            }
+
+            return AddToCart(number.ToString());
+        }
+
+        public IView ShowPageData()
         {
             return new ProductsView(products);
         }

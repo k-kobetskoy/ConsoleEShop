@@ -6,59 +6,90 @@ using static ConsoleEShop.User;
 
 namespace ConsoleEShop.Pages
 {
-    class PersonalInfoPage:BasePage, IPage
+    class PersonalInfoPage : BasePage, IPage
     {
-        public PersonalInfoPage(IIOService ioService, IDataService dataService, IClient client) : base(ioService, dataService,client)
+        public PersonalInfoPage(IIOService ioService, IDataService dataService, IClient client) : base(ioService, dataService, client)
         {
         }
 
-        public override Dictionary<string, Action> SetCommands()
+        public override Dictionary<string, Func<string>> SetCommands()
         {
             switch (context.CurrentUser.Role)
             {
                 case Roles.Guest:
-                    return new Dictionary<string, Action>();
+                    return new Dictionary<string, Func<string>>();
                 case Roles.RegisteredUser:
-                {
-                    return new Dictionary<string, Action>
                     {
-                        {"product", () => ShowProduct(Param)},
-                        {"products", ShowAllProducts},
-                        {"cart", ShowMyCart},
+                        return new Dictionary<string, Func<string>>
+                    {
+                        {"product", () => ShowProductPage(Param)},
+                        {"products", ShowAllProductsPage},
+                        {"cart", ShowMyCartPage},
                         {"orders", ShowMyOrdersPage},
                         {"logout", Logout},
-                        {"user info", ShowMyInfo},
+                        {"user info", ShowMyInfoPage},
                         {"change name", ChangeName},
                         {"change pass", ChangePassword},
 
                     };
-                }
-                    break;
+                    }
+
                 case
                     Roles.Administrator:
-                {
-                    return new Dictionary<string, Action>
                     {
-                        {"product", () => ShowProduct(Param)},
-                        {"products", ShowAllProducts},
-                        {"cart", ShowMyCart},
+                        return new Dictionary<string, Func<string>>
+                    {
+                        {"product", () => ShowProductPage(Param)},
+                        {"products", ShowAllProductsPage},
+                        {"cart", ShowMyCartPage},
                         {"orders", ShowMyOrdersPage},
                         {"logout", Logout},
-                        {"user info", ShowMyInfo},
-                        {"m users", ManageUsers},
-                        {"m orders", ManageOrders},
-                        {"m products", ManageProducts},
+                        {"user info", ShowMyInfoPage},
+                        {"m users", ShowManageUsersPage},
+                        {"m orders", ShowManageOrdersPage},
+                        {"m products", ShowManageProductsPage},
                     };
-                }
-                  default: return new Dictionary<string, Action>();
+                    }
+                default:
+                    return new Dictionary<string, Func<string>>();
             }
         }
 
-        public override IView ShowPageData()
+
+        public string ChangeName()
+        {
+            var name = communicator.AskForString("Write desired new name", "name", 3);
+
+            if (string.IsNullOrWhiteSpace(name))
+            
+              return ShowWelcomeInfo("Operation canceled");
+              
+            
+
+            context.CurrentUser.Name = name;
+            dataService.UpdateUserName(context.CurrentUser);
+            return ShowWelcomeInfo("Name changed successful");
+             
+        }
+
+        public string ChangePassword()
+        {
+            var password = communicator.AskForString("Write desired new password", "password", 3);
+
+            if (string.IsNullOrWhiteSpace(password))
+            {
+                return ShowWelcomeInfo("Operation canceled");
+                 
+            }
+
+            context.CurrentUser.Password = password;
+            dataService.UpdateUserPassword(context.CurrentUser);
+            return ShowWelcomeInfo("Password changed successful");
+        }
+
+        public IView ShowPageData()
         {
             return new UserView(context.CurrentUser);
-            //ioService.Write($"Name: {context.CurrentUser.Name}\n" +
-            //                $"Role: {context.CurrentUser.Role}");
         }
     }
 }
