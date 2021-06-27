@@ -16,15 +16,16 @@ namespace ConsoleEShop.Pages
 
         }
 
-        public override Dictionary<string, Func<string>> SetCommands()
+        public override void SetCommands()
         {
             switch (context.CurrentUser.Role)
             {
                 case Roles.Guest:
-                    return new Dictionary<string, Func<string>>();
+                    Commands = new Dictionary<string, Func<string>>();
+                    break;
                 case Roles.RegisteredUser:
                     {
-                        return new Dictionary<string, Func<string>>
+                        Commands =  new Dictionary<string, Func<string>>
                          {
                              {"product", () => ShowProductPage(Param)},
                              {"products", ShowAllProductsPage},
@@ -35,12 +36,13 @@ namespace ConsoleEShop.Pages
                              {"recieved", SetRecievedStatus},
                              {"cancel", CancelOrder}
                          };
+                        break;
                     }
 
                 case
                     Roles.Administrator:
                     {
-                        return new Dictionary<string, Func<string>>
+                        Commands = new Dictionary<string, Func<string>>
                          {
                              {"product", () => ShowProductPage(Param)},
                              {"products", ShowAllProductsPage},
@@ -54,9 +56,11 @@ namespace ConsoleEShop.Pages
                              {"recieved", SetRecievedStatus},
                              {"cancel", CancelOrder}
                          };
+                        break;
                     }
                 default:
-                    return new Dictionary<string, Func<string>>();
+                    Commands = new Dictionary<string, Func<string>>();
+                    break;
             }
         }
 

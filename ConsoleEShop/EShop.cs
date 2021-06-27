@@ -49,7 +49,8 @@ namespace ConsoleEShop
             }
             CurrentUser = user;
             SetCart();
-            currentPage.Commands = currentPage.SetCommands();
+            ContextChanged?.Invoke(this, EventArgs.Empty);
+            
         }
         public void SetCurrentPage(IPage page)
         {

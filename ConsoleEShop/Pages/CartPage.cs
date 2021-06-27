@@ -8,7 +8,7 @@ using static ConsoleEShop.User;
 
 namespace ConsoleEShop.Pages
 {
-    class CartPage : BasePage, IPage
+    public class CartPage : BasePage, IPage
     {
 
 
@@ -16,15 +16,16 @@ namespace ConsoleEShop.Pages
         {
         }
 
-        public override Dictionary<string, Func<string>> SetCommands()
+        public override void SetCommands()
         {
             switch (context.CurrentUser.Role)
             {
                 case Roles.Guest:
-                    return new Dictionary<string, Func<string>>();
+                    Commands = new Dictionary<string, Func<string>>();
+                    break;
                 case Roles.RegisteredUser:
                     {
-                        return new Dictionary<string, Func<string>>
+                        Commands = new Dictionary<string, Func<string>>
                     {
                         {"product", () => ShowProductPage(Param)},
                         {"products", ShowAllProductsPage},
@@ -37,12 +38,13 @@ namespace ConsoleEShop.Pages
                         {"quantity",()=> EditQuantity()},
                         {"remove",()=> RemoveItemFromCart()},
                     };
+                        break;
                     }
                 
                 case
                     Roles.Administrator:
                     {
-                        return new Dictionary<string, Func<string>>
+                        Commands = new Dictionary<string, Func<string>>
                     {
                         {"product", () => ShowProductPage(Param)},
                         {"products", ShowAllProductsPage},
@@ -58,9 +60,11 @@ namespace ConsoleEShop.Pages
                         {"quantity",()=> EditQuantity()},
                         {"remove",()=> RemoveItemFromCart()},
                     };
+                        break;
                     }
                 default:
-                    return new Dictionary<string, Func<string>>();
+                    Commands = new Dictionary<string, Func<string>>();
+                    break;
             }
         }
         public string EditQuantity(string index = null)

@@ -18,7 +18,7 @@ namespace ConsoleEShop.Pages
             
         }
 
-        public override Dictionary<string, Func<string>> SetCommands()
+        public override void SetCommands()
         {
             
             
@@ -26,18 +26,19 @@ namespace ConsoleEShop.Pages
             {
                 case Roles.Guest:
                 {
-                    return new Dictionary<string, Func<string>>
+                    Commands = new Dictionary<string, Func<string>>
                     {
                         {"register", Register},
                         {"login",()=> Login()},
                         {"product", () => ShowProductPage(Param)},
                         {"products", ShowAllProductsPage},
                     };
+                    break;
                 }
                     
                 case Roles.RegisteredUser:
                 {
-                    return new Dictionary<string, Func<string>>
+                    Commands = new Dictionary<string, Func<string>>
                     {
                         {"product", () => ShowProductPage(Param)},
                         {"products", ShowAllProductsPage},
@@ -47,12 +48,13 @@ namespace ConsoleEShop.Pages
                         {"user info", ShowMyInfoPage},
                         {"byu", ()=> AddToCart(Param)}
                     };
+                    break;
                 }
                     
                 case
                     Roles.Administrator:
                 {
-                    return new Dictionary<string, Func<string>>
+                    Commands = new Dictionary<string, Func<string>>
                     {
                         {"product", () => ShowProductPage(Param)},
                         {"products", ShowAllProductsPage},
@@ -65,10 +67,12 @@ namespace ConsoleEShop.Pages
                         {"m products", ShowManageProductsPage},
                         {"byu", () =>  AddToCart(Param)},
                     };
+                    break;
                 }
                     
                 default:
-                    return new Dictionary<string, Func<string>> ();
+                    Commands = new Dictionary<string, Func<string>> ();
+                    break;
                     
             }
         }

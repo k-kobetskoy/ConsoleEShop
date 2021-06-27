@@ -199,15 +199,16 @@ namespace ConsoleEShop.Pages
             this.ioService = ioService;
             this.dataService = dataService;
             this.client = client;
-            context.ContextChanged += SetCommands();
+            
         }
 
+
         public abstract IView ShowPageData();
-        public abstract Dictionary<string, Func<string>> SetCommands();
-       
+        public abstract void SetCommands();
         public void SetContext(EShop context)
         {
             this.context = context;
+            SetCommands();
         }
 
         public string ShowWelcomeInfo(string message = null)

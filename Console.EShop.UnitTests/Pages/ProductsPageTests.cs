@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using ConsoleEShop;
 using ConsoleEShop.Pages;
@@ -32,7 +33,10 @@ namespace Console.EShop.UnitTests.Pages
             context.CurrentUser = new User() {Role = role};
             productsPage.SetContext(context);
             
-            var keys = productsPage.SetCommands().Keys.ToList();
+
+            var keys = productsPage.Commands.Keys.ToList();
+            
+            //var keys = productsPage.SetCommands(context, null).Keys.ToList();
             Assert.AreEqual(keys, expectedCommands);
         }
 

@@ -134,26 +134,20 @@ namespace Console.EShop.UnitTests.Pages
             var ioService = new Mock<IIOService>();
             var dataService = new Mock<IDataService>();
             var client = new Mock<IClient>();
-            var context = new Mock<IEShop>();
-
-            context.Setup(c => c.SetCurrentPage(It.IsAny<IPage>()));
 
 
             dataService.Setup(d => d.GetProductByName(input))
                 .Returns((Product)null);
 
 
-            pPage = new ProductsPage(ioService.Object, dataService.Object, client.Object)
-            {
-                Commands = It.IsAny<Dictionary<string, Func<string>>>()
-            };
+            pPage = new ProductsPage(ioService.Object, dataService.Object, client.Object);
+
 
             var actual = pPage.ShowProductPage(input);
 
             StringAssert.Contains(expected, actual);
         }
-
-
+        
 
     }
 }

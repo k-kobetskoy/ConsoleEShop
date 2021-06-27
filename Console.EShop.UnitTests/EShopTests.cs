@@ -40,7 +40,7 @@ namespace Console.EShop.UnitTests
         public void SetCurrentPage_WorksCorrect_Test()
         {
             var productPage = new Mock<IPage>();
-            productPage.SetupProperty()
+            //productPage.SetupProperty()
 
 
         }
