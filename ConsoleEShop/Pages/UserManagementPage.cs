@@ -48,7 +48,7 @@ namespace ConsoleEShop.Pages
             }
         }
 
-        public IView ShowPageData()
+        public override IView ShowPageData()
         {
             Users = dataService.GetAllUsers().ToList();
 
@@ -58,49 +58,48 @@ namespace ConsoleEShop.Pages
 
         public string SetUserName()
         {
-            var number = communicator.AskForNumber("Please enter user's index wich name you want to change", Users.Count);
+            var number = client.AskForNumber("Please enter user's index wich name you want to change", Users.Count);
             if (number > 0)
             {
-                var newName = communicator.AskForString("Please enter desired new name", "name", 3);
+                var newName = client.AskForString("Please enter desired new name", "name", 3);
 
                 if (!string.IsNullOrWhiteSpace(newName))
                 {
                     var user = Users[number - 1];
                     user.Name = newName;
                     dataService.UpdateUserName(user);
-                    ShowWelcomeInfo();
-                    return "Name changed successfuly";
+                   return ShowWelcomeInfo("Name changed successfuly");
+                   
                 }
             }
 
-            ShowWelcomeInfo();
-            return "Operation canceled";
+           return ShowAbortOperationMessage("Operation canceled");
+           
 
         }
         public string SetUserPassword()
         {
-            var number = communicator.AskForNumber("Please enter user's index wich password you want to change", Users.Count);
+            var number = client.AskForNumber("Please enter user's index wich password you want to change", Users.Count);
             if (number > 0)
             {
-                var newPass = communicator.AskForString("Please enter desired new password", "password", 3);
+                var newPass = client.AskForString("Please enter desired new password", "password", 3);
 
                 if (!string.IsNullOrWhiteSpace(newPass))
                 {
                     var user = Users[number - 1];
                     user.Password = newPass;
                     dataService.UpdateUserPassword(user);
-                    ShowWelcomeInfo();
-                    return "Password set successfuly";
+                   return ShowWelcomeInfo("Password set successfuly");
+                    
                     
                 }
             }
 
-            ShowWelcomeInfo();
-            return "Operation canceled";
+           return ShowAbortOperationMessage("Operation canceled");
         }
         public string SetUserRole()
         {
-            var number = communicator.AskForNumber("Please enter user's index wich role you want to change");
+            var number = client.AskForNumber("Please enter user's index wich role you want to change");
             if (number > 0 && number <= Users.Count)
             {
                 var i = 1;
@@ -108,20 +107,20 @@ namespace ConsoleEShop.Pages
                 {
                    ioService.Write($"{i++:D2} - {role}");
                 }
-                var roleNumber = communicator.AskForNumber("Please enter desired role's number", i);
+                var roleNumber = client.AskForNumber("Please enter desired role's number", i);
                 if (roleNumber>0)
                 {
                     var user = Users[number - 1];
                     user.Role = (Roles) roleNumber;
                     dataService.UpdateUserRole(user);
-                    ShowWelcomeInfo();
-                    return "Role set successfuly";
+                   return ShowWelcomeInfo("Role set successfuly");
+                     
                     
                 }
             }
 
-            ShowWelcomeInfo();
-            return "Operation canceled";
+           return ShowAbortOperationMessage("Operation canceled");
+             
         }
 
 

@@ -74,7 +74,7 @@ namespace ConsoleEShop.Pages
             return SetQuantity(product);
         }
 
-        public IView ShowPageData()
+        public override IView ShowPageData()
         {
             return new ProductView(product);
         }

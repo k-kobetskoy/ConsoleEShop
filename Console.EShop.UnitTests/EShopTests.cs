@@ -1,16 +1,16 @@
-﻿using NUnit.Framework;
+﻿using System;
 using ConsoleEShop;
-using System;
-using System.Collections.Generic;
-using System.Text;
+using ConsoleEShop.Pages;
 using Moq;
+using NUnit.Framework;
 
-namespace ConsoleEShop.Tests
+namespace Console.EShop.UnitTests
 {
     [TestFixture]
     public class EShopTests
     {
-        private EShop eShop;
+        private ConsoleEShop.EShop eShop;
+        
         [SetUp]
         public void Setup()
         {
@@ -18,25 +18,37 @@ namespace ConsoleEShop.Tests
             var dataService = new Mock<IDataService>();
             var client = new Mock<IClient>();
 
-            eShop = new EShop(ioService.Object, dataService.Object, client.Object);
+           
+
+            eShop = new ConsoleEShop.EShop(ioService.Object, dataService.Object, client.Object);
         }
 
         [Test]
-        public void SetCartReturnsNewCartTest()
+        public void SetCart_ReturnsNewCart_Test()
         {
             eShop.SetCart();
             Assert.That(eShop.Cart, Is.Not.Null);
         }
 
         [Test]
-        public void SetCurrentPageThrowsExceptionIfArgumentIsNullTest()
+        public void SetCurrentPage_ThrowsExceptionIfArgumentIsNull_Test()
         {
-
             Assert.Throws<ArgumentNullException>(() => eShop.SetCurrentPage(null));
         }
 
         [Test]
-        public void SetCurrentUserWithNoArgumentsReturnsGuestUserTest()
+        public void SetCurrentPage_WorksCorrect_Test()
+        {
+            var productPage = new Mock<IPage>();
+            productPage.SetupProperty()
+
+
+        }
+
+
+
+        [Test]
+        public void SetCurrentUserWithNoArguments_ReturnsGuestUser_Test()
         {
             eShop.SetCurrentUser();
             var user = eShop.CurrentUser;
@@ -46,7 +58,7 @@ namespace ConsoleEShop.Tests
             Assert.That(user.Password, Is.Null);
         }
         [Test]
-        public void SetCurrentUserSetsCorrectUserTest()
+        public void SetCurrentUser_SetsCorrectUser_Test()
         {
             const string expectedUserName = "MockUser";
             const Roles expectedUserRole = Roles.Administrator;
@@ -66,6 +78,31 @@ namespace ConsoleEShop.Tests
                 Assert.That(user.Name, Is.EqualTo(expectedUserName));
                 Assert.That(user.Password, Is.EqualTo(expectedUserPassword));
             });
+        }
+
+
+        [Test]
+        public void SetCurrentUser_ClearsCart_Test()
+        {
+
+            eShop.SetCart();
+            var cart = eShop.Cart;
+
+            const string expectedUserName = "MockUser";
+            const Roles expectedUserRole = Roles.Administrator;
+            const string expectedUserPassword = "123";
+            var user = new User
+            {
+                Name = expectedUserName,
+                Role = expectedUserRole,
+                Password = expectedUserPassword
+            };
+
+            eShop.SetCurrentUser(user);
+
+            var newCart = eShop.Cart;
+
+            Assert.AreNotEqual(cart, newCart);
         }
 
     }

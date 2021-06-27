@@ -51,8 +51,8 @@ namespace ConsoleEShop.Pages
             var order = SelectOrder();
             if (order is null)
             {
-                ShowWelcomeInfo();
-                return "Operation canceled";
+               return ShowAbortOperationMessage("Operation canceled");
+                
             }
 
             ioService.Highlight("Please enter № of status :");
@@ -62,7 +62,7 @@ namespace ConsoleEShop.Pages
             ioService.Write($"{03} - {OrderStatus.Sent}");
             ioService.Write($"{04} - {OrderStatus.Finished}");
 
-            var newStatusNo = communicator.AskForNumber("Please enter No of new status", 4);
+            var newStatusNo = client.AskForNumber("Please enter No of new status", 4);
 
             if (newStatusNo > 0)
             {
@@ -85,20 +85,20 @@ namespace ConsoleEShop.Pages
 
                 }
                 dataService.UpdateOrderStatus(order);
-                ShowWelcomeInfo();
-                return "Status changed successfuly";
+               return ShowWelcomeInfo("Status changed successfuly");
+               
                 
             }
-            ShowWelcomeInfo();
-            return "Operation canceled";
+           return ShowAbortOperationMessage("Operation canceled");
+           
         }
         public Order SelectOrder()
         {
-            var number = communicator.AskForNumber("Please enter index of product you want to change", Orders.Count);
+            var number = client.AskForNumber("Please enter index of product you want to change", Orders.Count);
             return number > 0 ? Orders[number - 1] : null;
         }
 
-        public IView ShowPageData()
+        public override IView  ShowPageData()
         {
 
             return new OrdersView(dataService.GetOrders(),dataService);

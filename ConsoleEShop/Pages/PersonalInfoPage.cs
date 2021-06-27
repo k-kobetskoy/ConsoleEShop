@@ -58,11 +58,11 @@ namespace ConsoleEShop.Pages
 
         public string ChangeName()
         {
-            var name = communicator.AskForString("Write desired new name", "name", 3);
+            var name = client.AskForString("Write desired new name", "name", 3);
 
             if (string.IsNullOrWhiteSpace(name))
             
-              return ShowWelcomeInfo("Operation canceled");
+              return ShowAbortOperationMessage("Operation canceled");
               
             
 
@@ -74,11 +74,11 @@ namespace ConsoleEShop.Pages
 
         public string ChangePassword()
         {
-            var password = communicator.AskForString("Write desired new password", "password", 3);
+            var password = client.AskForString("Write desired new password", "password", 3);
 
             if (string.IsNullOrWhiteSpace(password))
             {
-                return ShowWelcomeInfo("Operation canceled");
+                return ShowAbortOperationMessage("Operation canceled");
                  
             }
 
@@ -87,7 +87,7 @@ namespace ConsoleEShop.Pages
             return ShowWelcomeInfo("Password changed successful");
         }
 
-        public IView ShowPageData()
+        public override IView ShowPageData()
         {
             return new UserView(context.CurrentUser);
         }

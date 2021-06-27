@@ -15,7 +15,7 @@ namespace ConsoleEShop.Pages
 
         private bool firstTime = true;
         
-        public IView ShowPageData()
+        public override IView ShowPageData()
         {
             
             if (firstTime)
@@ -76,9 +76,5 @@ namespace ConsoleEShop.Pages
                     return new Dictionary<string, Func<string>>();
             }
         }
-
-
-
-
     }
 }

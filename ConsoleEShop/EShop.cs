@@ -9,16 +9,17 @@ using ConsoleEShop.Pages;
 namespace ConsoleEShop
 {
 
-    public class EShop
+    public class EShop : IEShop
     {
         private readonly IIOService ioService;
         private readonly IDataService dataService;
         private readonly IClient client;
-        public IPage currentPage;
         
         
+        public IPage currentPage { get; set; }
         public Cart Cart { get; private set; }
         public User CurrentUser { get; set; }
+        public event EventHandler ContextChanged;
 
         public EShop(IIOService ioService, IDataService dataService, IClient client)
         {
@@ -26,41 +27,43 @@ namespace ConsoleEShop
             this.dataService = dataService;
             this.client = client;
             this.CurrentUser = new User { Role = Roles.Guest };
-            client.RequestRecieved +=Handle;
+            client.RequestRecieved += Handle;
 
             SetCurrentPage(new HomePage(ioService, dataService, client));
-            
+
             client.Response(currentPage.ShowPageData());
         }
 
- 
+
 
         public void SetCart()
         {
             Cart = new Cart();
         }
-        public void SetCurrentUser(User user=null)
+        public void SetCurrentUser(User user = null)
         {
-            if (user==null)
+            if (user == null)
             {
-                CurrentUser = new User {Role = Roles.Guest};
+                CurrentUser = new User { Role = Roles.Guest };
                 return;
             }
             CurrentUser = user;
             SetCart();
-          currentPage.Commands= currentPage.SetCommands();
+            currentPage.Commands = currentPage.SetCommands();
         }
         public void SetCurrentPage(IPage page)
         {
             currentPage = page ?? throw new ArgumentNullException(nameof(page));
             currentPage.SetContext(this);
-            currentPage.Commands=  currentPage.SetCommands();
+            
+            ContextChanged?.Invoke(this, EventArgs.Empty);
+            //currentPage.Commands = currentPage.SetCommands();
         }
 
-     
+
         public void Handle(object? sender, ClientRequestArgs args)
         {
-          
+
             string param = null;
             string command = args.Command;
             if (!currentPage.Commands.ContainsKey(args.Command))
@@ -74,8 +77,8 @@ namespace ConsoleEShop
             }
 
             currentPage.Param = param;
-           
-            client.Response(currentPage.Commands[command].Invoke()); 
+
+            client.Response(currentPage.Commands[command].Invoke());
         }
 
         private bool CheckComplexRequest(string request, out string command, out string param)

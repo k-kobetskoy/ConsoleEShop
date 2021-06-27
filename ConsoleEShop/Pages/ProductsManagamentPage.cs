@@ -51,18 +51,14 @@ namespace ConsoleEShop.Pages
 
         private string AddNewProduct()
         {
-            var name = communicator.AskForString("Please enter name of new product:", "name",3);
+            var name = client.AskForString("Please enter name of new product:", "name",3);
             if (string.IsNullOrWhiteSpace(name))
-            {
-                ShowWelcomeInfo();
-                return "Operation canceled";
-            }
-            var price = (decimal)communicator.AskForNumber("Please enter price of new product:");
+                return ShowAbortOperationMessage("Operation canceled");
+            
+            var price = (decimal)client.AskForNumber("Please enter price of new product:");
             if (price < 1)
-            {
-                ShowWelcomeInfo();
-                return "Operation canceled";
-            }
+                return ShowAbortOperationMessage("Operation canceled");
+           
             ioService.Highlight("List of categories:");
             var categories = dataService.GeAllCategories().ToArray();
             
@@ -71,18 +67,14 @@ namespace ConsoleEShop.Pages
                 ioService.Write($"{i+1:D2} - {categories[i].Name}");
             }
 
-            var categoryId = communicator.AskForNumber("Please enter desired No for category", categories.Length);
+            var categoryId = client.AskForNumber("Please enter desired No for category", categories.Length);
             if (categoryId<1)
-            {
-                ShowWelcomeInfo();
-                return "Operation canceled";
-            }
-            var desctription = communicator.AskForString("Please enter description for new product:", "desctription", 3);
+                return ShowAbortOperationMessage("Operation canceled");
+
+            var desctription = client.AskForString("Please enter description for new product:", "desctription", 3);
             if (string.IsNullOrWhiteSpace(desctription))
-            {
-                ShowWelcomeInfo();
-                return "Operation canceled";
-            }
+                return ShowAbortOperationMessage("Operation canceled");
+
             var product = new Product()
             {
                 Name = name,
@@ -91,8 +83,8 @@ namespace ConsoleEShop.Pages
                 Description = desctription,
             };
             dataService.AddNewProduct(product);
-            ShowWelcomeInfo();
-            return "Product added successfuly";
+           return ShowWelcomeInfo("Product added successfuly");
+           
             
         }
 
@@ -100,34 +92,27 @@ namespace ConsoleEShop.Pages
         {
             var product = SelectProduct();
             if (product is null)
-            {
-                ShowWelcomeInfo();
-                return "Operation canceled";
-            }
+                return ShowAbortOperationMessage("Operation canceled");
 
-            var newDesctiption = communicator.AskForString("Please enter desired new name", "descripion", 3);
+            var newDesctiption = client.AskForString("Please enter desired new name", "descripion", 3);
 
             if (!string.IsNullOrWhiteSpace(newDesctiption))
             {
 
                 product.Description = newDesctiption;
                 dataService.UpdateProduct(product);
-                ShowWelcomeInfo();
-                return "Name changed successfuly";
+               return ShowWelcomeInfo("Name changed successfuly");
+               
                 
             }
-            ShowWelcomeInfo();
-            return "Operation canceled";
+            return ShowAbortOperationMessage("Operation canceled");
         }
 
         private string SetProductCategory()
         {
             var product = SelectProduct();
             if (product is null)
-            {
-                ShowWelcomeInfo();
-                return "Operation canceled";
-            }
+                return ShowAbortOperationMessage("Operation canceled");
 
             var categories = dataService.GeAllCategories().ToArray();
             ioService.Highlight("List of categories:");
@@ -136,69 +121,60 @@ namespace ConsoleEShop.Pages
                 ioService.Write($"{i:D2} - {categories[i].Name}");
             }
 
-            var newCategoryNo = communicator.AskForNumber("Please enter desired No for category",  categories.Length);
+            var newCategoryNo = client.AskForNumber("Please enter desired No for category",  categories.Length);
 
             if (newCategoryNo>0)
             {
 
                 product.CategoryId = categories[newCategoryNo].Id;
                 dataService.UpdateProduct(product);
-                ShowWelcomeInfo();
-                return "Name changed successfuly";
+               return ShowWelcomeInfo("Name changed successfuly");
+               
                 
             }
-            ShowWelcomeInfo();
-            return "Operation canceled";
+            return ShowAbortOperationMessage("Operation canceled");
         }
 
         private string SetProductPrice()
         {
             var product = SelectProduct();
             if (product is null)
-            {
-                ShowWelcomeInfo();
-                return "Operation canceled";
-            }
+                return ShowAbortOperationMessage("Operation canceled");
 
-            var newPrice = communicator.AskForNumber("Please enter desired new price");
+            var newPrice = client.AskForNumber("Please enter desired new price");
 
             if (newPrice>0)
             {
 
                 product.Price = newPrice;
                 dataService.UpdateProduct(product);
-                ShowWelcomeInfo();
-                return "Price changed successfuly";
+               return ShowWelcomeInfo("Price changed successfuly");
+                
                
             }
-            ShowWelcomeInfo();
-            return "Operation canceled";
+            return ShowAbortOperationMessage("Operation canceled");
         }
 
         private string SetProductName()
         {
             var product = SelectProduct();
             if (product is null)
-            {
-                ShowWelcomeInfo();
-                return "Operation canceled";
-            }
+                return ShowAbortOperationMessage("Operation canceled");
 
-            var newName = communicator.AskForString("Please enter desired new name", "name", 3);
+            var newName = client.AskForString("Please enter desired new name", "name", 3);
 
             if (!string.IsNullOrWhiteSpace(newName))
             {
                 
                 product.Name = newName;
                 dataService.UpdateProduct(product);
-                ShowWelcomeInfo();
-                return "Name changed successfuly";
+               return ShowWelcomeInfo("Name changed successfuly");
+                
             }
-            ShowWelcomeInfo();
-            return "Operation canceled";
+            return ShowAbortOperationMessage("Operation canceled");
         }
 
-        public IView ShowPageData()
+        public override IView ShowPageData()
         {
 
 
@@ -209,7 +185,7 @@ namespace ConsoleEShop.Pages
 
         public Product SelectProduct()
         {
-            var number = communicator.AskForNumber("Please enter index of product you want to change", Products.Count);
+            var number = client.AskForNumber("Please enter index of product you want to change", Products.Count);
             return number > 0 ? Products[number - 1] : null;
         }
 

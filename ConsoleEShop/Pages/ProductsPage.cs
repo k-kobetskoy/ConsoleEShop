@@ -85,10 +85,10 @@ namespace ConsoleEShop.Pages
 
 
             if (productIndex>products.Count)
-            {
-                ShowWelcomeInfo();
-                return "There is no product with such index";
-            }
+            
+               return ShowAbortOperationMessage("There is no product with such index");
+               
+            
 
             var product = products[productIndex - 1];
             return SetQuantity(product);
@@ -97,18 +97,16 @@ namespace ConsoleEShop.Pages
        
         private string AskCartItemIndex()
         {
-            var number = communicator.AskForNumber("Please enter product's index", products.Count);
+            var number = client.AskForNumber("Please enter product's index", products.Count);
 
             if (number < 1)
-            {
-                ShowWelcomeInfo();
-                return "Operation was canceled";
-            }
+                return ShowAbortOperationMessage("Operation canceled");
+            
 
             return AddToCart(number.ToString());
         }
 
-        public IView ShowPageData()
+        public override IView ShowPageData()
         {
             return new ProductsView(products);
         }

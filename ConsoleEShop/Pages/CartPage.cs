@@ -66,72 +66,62 @@ namespace ConsoleEShop.Pages
         public string EditQuantity(string index = null)
         {
             if (string.IsNullOrWhiteSpace(index))
-                index = communicator.AskForNumber("Please enter № of product in cart you want to edit", context.Cart.Items.Count).ToString();
+                index = client.AskForNumber("Please enter № of product in cart you want to edit", context.Cart.Items.Count).ToString();
             if (string.IsNullOrWhiteSpace(index))
-            {
-                ShowWelcomeInfo();
-                return "Operation canceled";
-            }
+                return ShowAbortOperationMessage( "Operation canceled");
+               
+            
 
             var parseResult = int.TryParse(index, out var productIndex);
             if (productIndex > context.Cart.Items.Count)
-            {
-                ShowWelcomeInfo();
-                return "There is no product with such index";
-            }
+                return ShowAbortOperationMessage("There is no product with such index"); 
+            
 
             if (parseResult && productIndex > 0)
             {
-                var newQuantity = communicator.AskForNumber("Please enter desired new quantity");
+                var newQuantity = client.AskForNumber("Please enter desired new quantity");
 
                 if (newQuantity < 1)
-                {
-                    ShowWelcomeInfo();
-                    return "Operation canceled";
-                }
+                
+                   return ShowAbortOperationMessage("Operation canceled");
+                
 
                 context.Cart.Items[productIndex - 1].Quantity = newQuantity;
             }
-            ShowWelcomeInfo();
-            return "Incorrect input";
+            return ShowAbortOperationMessage("Incorrect input"); 
         }
 
         public string RemoveItemFromCart(string index = null)
         {
             if (string.IsNullOrWhiteSpace(index))
-                index = communicator.AskForNumber("Please enter № of product in cart you want to remove", context.Cart.Items.Count).ToString();
+                index = client.AskForNumber("Please enter № of product in cart you want to remove", context.Cart.Items.Count).ToString();
 
             if (string.IsNullOrWhiteSpace(index))
             {
-                ShowWelcomeInfo();
-                return "Operation canceled";
+                return ShowAbortOperationMessage("Operation canceled");
             }
 
             var parse = int.TryParse(index, out int itemIndexToRemove);
             if (!parse || itemIndexToRemove < 1)
             {
-                ShowWelcomeInfo();
-                return "Incorrect input";
+                return ShowAbortOperationMessage("Incorrect input"); 
             }
 
             if (itemIndexToRemove > context.Cart.Items.Count)
             {
-                ShowWelcomeInfo();
-                return "There is no product with such index";
+                return ShowAbortOperationMessage("There is no product with such index");
             }
 
 
             context.Cart.Items.RemoveAt(itemIndexToRemove - 1);
-            ShowWelcomeInfo();
-            return "Item removed successfuly";
+           return ShowWelcomeInfo("Item removed successfuly");
         }
         public string Checkout()
         {
             if (context.Cart == null || context.Cart.ItemsCount == 0)
-            {
-                ShowWelcomeInfo();
-                return "You have nothing to checkout";
-            }
+                return ShowAbortOperationMessage("You have nothing to checkout");
+               
+            
 
             var order = new Order()
             {
@@ -141,23 +131,22 @@ namespace ConsoleEShop.Pages
             };
             dataService.AddOrder(order);
             context.SetCart();
-            ShowWelcomeInfo();
-            return "Order was made successfully";
+           return ShowWelcomeInfo("Order was made successfully");
         }
 
         public string ClearCart()
         {
             if (context.Cart == null || context.Cart.ItemsCount == 0)
             {
-                ShowWelcomeInfo();
-                return "Cart is empty";
+               return ShowWelcomeInfo("Cart is empty");
+                
             }
 
             context.Cart.Items = new List<CartItem>();
-            ShowWelcomeInfo();
-            return "All items was removed from your cart";
+          return  ShowWelcomeInfo("All items was removed from your cart");
+           
         }
-        public IView ShowPageData()
+        public override IView ShowPageData()
         {
             return new CartView(context.Cart, dataService);
         }

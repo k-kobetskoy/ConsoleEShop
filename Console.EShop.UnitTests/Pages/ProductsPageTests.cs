@@ -27,7 +27,7 @@ namespace Console.EShop.UnitTests.Pages
         [TestCase(new[]{ "register", "login", "product", "products"}, Roles.Guest)]
         [TestCase(new[] { "product", "products", "cart", "orders", "logout", "user info", "byu" }, Roles.RegisteredUser)]
         [TestCase(new[] { "product", "products", "cart", "orders", "logout", "user info", "m users", "m orders", "m products", "byu" }, Roles.Administrator)]
-        public void SetCommandsReturnsCorrectCommandsTest(string[] expectedCommands, Roles role)
+        public void SetCommands_ReturnsCorrectCommands_Test(string[] expectedCommands, Roles role)
         {
             context.CurrentUser = new User() {Role = role};
             productsPage.SetContext(context);
@@ -39,7 +39,7 @@ namespace Console.EShop.UnitTests.Pages
         [Test]
         [TestCase("TestName-1", "TestDescription-1")]
         [TestCase("TestName-2", "TestDescription-1")]
-        public void ShowPageDataTest(string productName, string productDescription)
+        public void ShowPageData_ReturnsCorrectData_Test(string productName, string productDescription)
         {
             var dataService = new Mock<IDataService>();
             dataService.Setup(d => d.GetProducts())

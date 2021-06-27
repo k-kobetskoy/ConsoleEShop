@@ -63,27 +63,27 @@ namespace ConsoleEShop.Pages
 
         public string CancelOrder()
         {
-            var number = communicator.AskForNumber("Please enter No of order you want to cancel", Orders.Count);
+            var number = client.AskForNumber("Please enter No of order you want to cancel", Orders.Count);
             if (number < 1)
-                return ShowWelcomeInfo("Operation canceled");
+                return ShowAbortOperationMessage("Operation canceled");
               
            
 
             var order = Orders[number - 1];
             order.Status = OrderStatus.CanceledByUser;
             dataService.UpdateOrderStatus(order);
-          return  ShowWelcomeInfo("Order was canceled");
+          return ShowAbortOperationMessage("Order was canceled");
         }
 
         public string SetRecievedStatus()
         {
             if (!Orders.Any())
-                return  ShowWelcomeInfo("There is no orders");
+                return ShowAbortOperationMessage("There is no orders");
              
             
-            var orderIndex = communicator.AskForNumber("Enter № of order you recieved", Orders.Count);
+            var orderIndex = client.AskForNumber("Enter № of order you recieved", Orders.Count);
             if (orderIndex < 1)
-                return ShowWelcomeInfo("Operation canceled");
+                return ShowAbortOperationMessage("Operation canceled");
 
             var order = Orders[orderIndex - 1];
             order.Status = OrderStatus.Recieved;
@@ -93,7 +93,7 @@ namespace ConsoleEShop.Pages
         }
 
 
-        public IView ShowPageData()
+        public override IView ShowPageData()
         {
             Orders = dataService.GetUserOrders(context.CurrentUser.Id).OrderBy(o => o.OrderId)?.ToList();
             return new OrdersView(Orders, dataService);
