@@ -11,7 +11,7 @@ namespace ConsoleEShop.Pages
     public class OrdersPage : BasePage, IPage
     {
         private List<Order> Orders { get; set; }
-        public OrdersPage(IIOService ioService, IDataService dataService, IClient client) : base(ioService, dataService, client)
+        public OrdersPage( IDataService dataService, IClient client) : base( dataService, client)
         {
 
         }

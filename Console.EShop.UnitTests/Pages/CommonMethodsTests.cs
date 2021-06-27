@@ -27,7 +27,7 @@ namespace Console.EShop.UnitTests.Pages
             const string input = "Wrong login";
             const string expected = "No users with this login";
 
-            var ioService = new Mock<IIOService>();
+            
             var dataService = new Mock<IDataService>();
             var client = new Mock<IClient>();
 
@@ -36,7 +36,7 @@ namespace Console.EShop.UnitTests.Pages
             client.Setup(c => c.AskForString(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<int>()))
                 .Returns(input);
 
-            page = new HomePage(ioService.Object, dataService.Object, client.Object);
+            page = new HomePage( dataService.Object, client.Object);
 
             var actual = page.Login();
             StringAssert.Contains(expected, actual);
@@ -48,14 +48,14 @@ namespace Console.EShop.UnitTests.Pages
             const string input = (string)null;
             const string expected = "Operation was canceled";
 
-            var ioService = new Mock<IIOService>();
+            
             var dataService = new Mock<IDataService>();
             var client = new Mock<IClient>();
 
             client.Setup(c => c.AskForString(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<int>()))
                 .Returns(input);
 
-            page = new HomePage(ioService.Object, dataService.Object, client.Object);
+            page = new HomePage(dataService.Object, client.Object);
 
             var actual = page.Login();
             StringAssert.Contains(expected, actual);
@@ -69,7 +69,7 @@ namespace Console.EShop.UnitTests.Pages
             const string expected = "Operation was canceled";
             const string key = "TestKey";
 
-            var ioService = new Mock<IIOService>();
+            
             var dataService = new Mock<IDataService>();
             var client = new Mock<IClient>();
 
@@ -77,7 +77,7 @@ namespace Console.EShop.UnitTests.Pages
                 .Returns(input);
 
 
-            pPage = new ProductsPage(ioService.Object, dataService.Object, client.Object);
+            pPage = new ProductsPage( dataService.Object, client.Object);
             pPage.Commands = new Dictionary<string, Func<string>>() {{key, It.IsAny<Func<string>>()}};
             var actual = pPage.Register();
             StringAssert.Contains(expected, actual);
@@ -89,14 +89,14 @@ namespace Console.EShop.UnitTests.Pages
 
             const string expected = "Operation was canceled";
 
-            var ioService = new Mock<IIOService>();
+            
             var dataService = new Mock<IDataService>();
             var client = new Mock<IClient>();
 
             client.Setup(c => c.AskForNumber(It.IsAny<string>(), It.IsAny<int>()))
                 .Returns(input);
 
-            pPage = new ProductsPage(ioService.Object, dataService.Object, client.Object);
+            pPage = new ProductsPage( dataService.Object, client.Object);
             pPage.Commands = It.IsAny<Dictionary<string, Func<string>>>();
             var actual = pPage.SetQuantity(new Product());
             StringAssert.Contains(expected, actual);
@@ -108,7 +108,7 @@ namespace Console.EShop.UnitTests.Pages
             const string input = (string)null;
             const string expected = "Operation was canceled";
 
-            var ioService = new Mock<IIOService>();
+           
             var dataService = new Mock<IDataService>();
             var client = new Mock<IClient>();
 
@@ -116,7 +116,7 @@ namespace Console.EShop.UnitTests.Pages
                 .Returns(input);
 
 
-            pPage = new ProductsPage(ioService.Object, dataService.Object, client.Object);
+            pPage = new ProductsPage( dataService.Object, client.Object);
             pPage.Commands = It.IsAny<Dictionary<string, Func<string>>>();
             var actual = pPage.ShowProductPage();
 
@@ -131,7 +131,7 @@ namespace Console.EShop.UnitTests.Pages
      
             const string expected = "Can't find this product";
 
-            var ioService = new Mock<IIOService>();
+           
             var dataService = new Mock<IDataService>();
             var client = new Mock<IClient>();
 
@@ -140,7 +140,7 @@ namespace Console.EShop.UnitTests.Pages
                 .Returns((Product)null);
 
 
-            pPage = new ProductsPage(ioService.Object, dataService.Object, client.Object);
+            pPage = new ProductsPage( dataService.Object, client.Object);
 
 
             var actual = pPage.ShowProductPage(input);

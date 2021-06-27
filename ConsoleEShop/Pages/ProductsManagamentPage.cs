@@ -10,7 +10,7 @@ namespace ConsoleEShop.Pages
     public class ProductsManagamentPage:BasePage, IPage
     {
         private List<Product> Products { get; set; }
-        public ProductsManagamentPage(IIOService ioService, IDataService dataService, IClient client) : base(ioService, dataService,client)
+        public ProductsManagamentPage( IDataService dataService, IClient client) : base( dataService,client)
         {
             
         }
@@ -63,12 +63,12 @@ namespace ConsoleEShop.Pages
             if (price < 1)
                 return ShowAbortOperationMessage("Operation canceled");
            
-            ioService.Highlight("List of categories:");
+            client.Write("List of categories:");
             var categories = dataService.GeAllCategories().ToArray();
             
             for (int i = 0; i < categories.Count(); i++)
             {
-                ioService.Write($"{i+1:D2} - {categories[i].Name}");
+                client.Write($"{i+1:D2} - {categories[i].Name}");
             }
 
             var categoryId = client.AskForNumber("Please enter desired No for category", categories.Length);
@@ -119,10 +119,10 @@ namespace ConsoleEShop.Pages
                 return ShowAbortOperationMessage("Operation canceled");
 
             var categories = dataService.GeAllCategories().ToArray();
-            ioService.Highlight("List of categories:");
+            client.Write("List of categories:");
             for (int i = 1; i <= categories.Count(); i++)
             {
-                ioService.Write($"{i:D2} - {categories[i].Name}");
+                client.Write($"{i:D2} - {categories[i].Name}");
             }
 
             var newCategoryNo = client.AskForNumber("Please enter desired No for category",  categories.Length);

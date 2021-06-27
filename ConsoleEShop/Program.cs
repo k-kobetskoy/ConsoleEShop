@@ -9,13 +9,13 @@ namespace ConsoleEShop
         static void Main(string[] args)
         {
 
-            var ioService = new IOService();
+            
             var dataService = new DataService();
            
-            var client = new Client(ioService);
+            var client = new Client();
            
-            var shop = new EShop(ioService, dataService, client);
-            //shop.SetCurrentPage(new HomePage(ioService, dataService));
+            var shop = new EShop(dataService, client);
+            
             
             client.StartListen();
         }

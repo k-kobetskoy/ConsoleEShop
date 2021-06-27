@@ -17,11 +17,11 @@ namespace Console.EShop.UnitTests.Pages
         [SetUp]
         public void Setup()
         {
-            var ioService = new Mock<IIOService>();
+            
             var dataService = new Mock<IDataService>();
             var client = new Mock<IClient>();
-            productsPage = new ProductsPage(ioService.Object, dataService.Object, client.Object);
-            context = new ConsoleEShop.EShop(ioService.Object, dataService.Object, client.Object);
+            productsPage = new ProductsPage( dataService.Object, client.Object);
+            context = new ConsoleEShop.EShop( dataService.Object, client.Object);
         }
 
         [Test]
@@ -36,7 +36,7 @@ namespace Console.EShop.UnitTests.Pages
 
             var keys = productsPage.Commands.Keys.ToList();
             
-            //var keys = productsPage.SetCommands(context, null).Keys.ToList();
+            
             Assert.AreEqual(keys, expectedCommands);
         }
 
@@ -51,8 +51,8 @@ namespace Console.EShop.UnitTests.Pages
             var client = new Mock<IClient>();
 
 
-            var ioService = new Mock<IIOService>();
-            var pPage = new ProductsPage(ioService.Object, dataService.Object, client.Object);
+           
+            var pPage = new ProductsPage(dataService.Object, client.Object);
             var prodViewResult = pPage.ShowPageData().ShowViewData();
 
             StringAssert.Contains("TestName-1", prodViewResult);

@@ -11,7 +11,7 @@ namespace ConsoleEShop.Pages
     public class ProductPage : BasePage,  IPage
     {
         private readonly Product product;
-        public ProductPage(IIOService ioService, IDataService dataService,  Product product, IClient client) :base(ioService, dataService,client)
+        public ProductPage( IDataService dataService,  Product product, IClient client) :base( dataService,client)
         {
             this.product = product;
 

@@ -8,7 +8,7 @@ namespace ConsoleEShop.Pages
 {
     class PersonalInfoPage : BasePage, IPage
     {
-        public PersonalInfoPage(IIOService ioService, IDataService dataService, IClient client) : base(ioService, dataService, client)
+        public PersonalInfoPage( IDataService dataService, IClient client) : base( dataService, client)
         {
         }
 

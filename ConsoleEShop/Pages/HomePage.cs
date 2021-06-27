@@ -8,7 +8,7 @@ namespace ConsoleEShop.Pages
 {
     public class HomePage :BasePage, IPage
     {
-        public HomePage(IIOService ioService, IDataService dataService, IClient client) :base(ioService, dataService, client)
+        public HomePage( IDataService dataService, IClient client) :base( dataService, client)
         {
             
         }

@@ -6,18 +6,6 @@ using ConsoleEShop.Views;
 
 namespace ConsoleEShop
 {
-
-    public interface IClient
-    {
-        void StartListen();
-        event EventHandler<ClientRequestArgs> RequestRecieved;
-        void Response(string response);
-        string ReadOrAbort();
-        void Response(IView responce);
-        int AskForNumber(string message, int upperBound = 0);
-        string AskForString(string message, string paramName, int minLength = 0);
-    }
-
     public class ClientRequestArgs : EventArgs
     {
         public string Command { get; set; }
@@ -26,18 +14,14 @@ namespace ConsoleEShop
 
     public class Client:IClient
     {
-        private readonly IIOService ioService;
+        
         public event EventHandler<ClientRequestArgs> RequestRecieved;
 
-        public Client(IIOService ioService)
-        {
-            this.ioService = ioService;
-        }
         public void StartListen()
         {
             while (true)
             {
-                var command = ioService.Read();
+                var command = Console.ReadLine();
 
                 if (string.IsNullOrWhiteSpace(command))
                     continue;
@@ -96,24 +80,36 @@ namespace ConsoleEShop
             return null;
         }
 
+        public string Read()
+        {
+            return Console.ReadLine();
+
+
+        }
+
+        public void Write(string s)
+        {
+
+            Console.WriteLine(s);
+        }
 
         public void Response(IView responce)
         {
-           ioService.Clear();
-            ioService.Write(responce.ShowViewData());
+           Console.Clear();
+            Console.WriteLine(responce.ShowViewData());
         }
 
         public void Response(string response)
         {
-            ioService.Clear();
-            ioService.Write(response);
+            Console.Clear();
+            Console.WriteLine(response);
         }
         public int AskForNumber(string message, int upperBound = 0)
         {
             while (true)
             {
-                ioService.Write(message);
-                var response = ioService.ReadOrAbort();
+                Console.WriteLine(message);
+                var response = ReadOrAbort();
                 if (string.IsNullOrWhiteSpace(response))
                     return -1;
 
@@ -135,7 +131,7 @@ namespace ConsoleEShop
                         return result;
                     }
 
-                    ioService.Write($"Value can't be greater than {upperBound}");
+                    Console.WriteLine($"Value can't be greater than {upperBound}");
                 }
 
                 message = "please enter correct number or pres Escape to abort operation";
@@ -145,13 +141,13 @@ namespace ConsoleEShop
         {
             while (true)
             {
-                ioService.Write(message);
-                var result = ioService.ReadOrAbort();
+                Console.WriteLine(message);
+                var result = ReadOrAbort();
                 if (string.IsNullOrWhiteSpace(result)) return null;
 
                 if (minLength > 0 && result.Length < minLength)
                 {
-                    ioService.Write($"{paramName} must contain at least {minLength} symbols");
+                    Console.WriteLine($"{paramName} must contain at least {minLength} symbols");
                     message += "\nOr press Esc to abort operation";
                 }
                 else

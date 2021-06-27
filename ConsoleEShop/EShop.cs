@@ -11,25 +11,24 @@ namespace ConsoleEShop
 
     public class EShop : IEShop
     {
-        private readonly IIOService ioService;
+    
         private readonly IDataService dataService;
         private readonly IClient client;
-        
         
         public IPage currentPage { get; set; }
         public Cart Cart { get; private set; }
         public User CurrentUser { get; set; }
-        public event EventHandler ContextChanged;
+        
 
-        public EShop(IIOService ioService, IDataService dataService, IClient client)
+        public EShop( IDataService dataService, IClient client)
         {
-            this.ioService = ioService;
+           
             this.dataService = dataService;
             this.client = client;
             this.CurrentUser = new User { Role = Roles.Guest };
             client.RequestRecieved += Handle;
 
-            SetCurrentPage(new HomePage(ioService, dataService, client));
+            SetCurrentPage(new HomePage( dataService, client));
 
             client.Response(currentPage.ShowPageData());
         }
@@ -49,16 +48,12 @@ namespace ConsoleEShop
             }
             CurrentUser = user;
             SetCart();
-            ContextChanged?.Invoke(this, EventArgs.Empty);
-            
         }
         public void SetCurrentPage(IPage page)
         {
             currentPage = page ?? throw new ArgumentNullException(nameof(page));
             currentPage.SetContext(this);
             
-            ContextChanged?.Invoke(this, EventArgs.Empty);
-            //currentPage.Commands = currentPage.SetCommands();
         }
 
 

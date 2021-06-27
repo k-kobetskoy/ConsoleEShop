@@ -9,7 +9,7 @@ namespace ConsoleEShop.Pages
     internal class UserManagementPage : BasePage, IPage
     {
         private List<User> Users { get; set; }
-        public UserManagementPage(IIOService ioService, IDataService dataService, IClient client) : base(ioService, dataService,client)
+        public UserManagementPage( IDataService dataService, IClient client) : base( dataService,client)
         {
            
         }
@@ -109,7 +109,7 @@ namespace ConsoleEShop.Pages
                 var i = 1;
                 foreach (var role in Enum.GetValues(typeof(Roles)))
                 {
-                   ioService.Write($"{i++:D2} - {role}");
+                   client.Write($"{i++:D2} - {role}");
                 }
                 var roleNumber = client.AskForNumber("Please enter desired role's number", i);
                 if (roleNumber>0)

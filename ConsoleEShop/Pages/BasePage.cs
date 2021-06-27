@@ -9,57 +9,6 @@ using ConsoleEShop.Views;
 
 namespace ConsoleEShop.Pages
 {
-    //Orders
-    public abstract partial class BasePage
-    {
-        public string ShowMyOrdersPage()
-        {
-            context.SetCurrentPage(new OrdersPage(ioService, dataService, client));
-            return context.currentPage.ShowPageData().ShowViewData();
-        }
-
-    }
-    //Cart
-    public abstract partial class BasePage
-    {
-        public string ShowMyCartPage()
-        {
-            context.SetCurrentPage(new CartPage(ioService, dataService, client));
-            return context.currentPage.ShowPageData().ShowViewData();
-        }
-    }
-
-    //Personal Info
-    public abstract partial class BasePage
-    {
-        public string ShowMyInfoPage()
-        {
-            context.SetCurrentPage(new PersonalInfoPage(ioService, dataService, client));
-            return context.currentPage.ShowPageData().ShowViewData();
-        }
-
-    }
-
-    //Administrator
-    public abstract partial class BasePage
-    {
-        public string ShowManageUsersPage()
-        {
-            context.SetCurrentPage(new UserManagementPage(ioService, dataService, client));
-            return context.currentPage.ShowPageData().ShowViewData();
-        }
-
-        public string ShowManageProductsPage()
-        {
-            context.SetCurrentPage(new ProductsManagamentPage(ioService, dataService, client));
-            return context.currentPage.ShowPageData().ShowViewData();
-        }
-        public string ShowManageOrdersPage()
-        {
-            context.SetCurrentPage(new OrdersManagamentPage(ioService, dataService, client));
-            return context.currentPage.ShowPageData().ShowViewData();
-        }
-    }
 
     //Login register
     public abstract partial class BasePage
@@ -67,7 +16,7 @@ namespace ConsoleEShop.Pages
         public string Logout()
         {
             context.SetCurrentUser();
-            context.SetCurrentPage(new HomePage(ioService, dataService, client));
+            context.SetCurrentPage(new HomePage(dataService, client));
             return context.currentPage.ShowPageData().ShowViewData();
         }
         public string Login()
@@ -83,40 +32,38 @@ namespace ConsoleEShop.Pages
 
             return CheckPassword(user);
         }
-
         public string Register()
         {
             var login = client.AskForString("Enter your login", "login", 3); ;
             if (login is null)
                 return ShowAbortOperationMessage("Operation was canceled");
-              
-            
+
+
 
             var password = client.AskForString("Enter your password:", "password", 3);
             if (password is null)
-              return ShowAbortOperationMessage("Operation was canceled");
+                return ShowAbortOperationMessage("Operation was canceled");
 
 
             var user = dataService.AddUser(login, password);
             context.SetCurrentUser(user);
-           return ShowWelcomeInfo($"Hello, {user.Name}!");
+            return ShowWelcomeInfo($"Hello, {user.Name}!");
         }
-
         private string CheckPassword(User user)
         {
             var pass = client.AskForString("Enter your password", "password", 3);
 
             if (pass is null)
                 return ShowAbortOperationMessage("Operation was canceled");
-            
+
 
             if (user.Password == pass)
             {
                 context.SetCurrentUser(user);
-               return ShowWelcomeInfo("Login successfull");
+                return ShowWelcomeInfo("Login successfull");
             }
 
-          return ShowAbortOperationMessage("Wrong password. Try again or press Escape to return");
+            return ShowAbortOperationMessage("Wrong password. Try again or press Escape to return");
         }
 
     }
@@ -124,20 +71,15 @@ namespace ConsoleEShop.Pages
     //Products | Product
     public abstract partial class BasePage
     {
-        public string ShowAllProductsPage()
-        {
-            context.SetCurrentPage(new ProductsPage(ioService, dataService, client));
-            return ShowWelcomeInfo();
-        }
         public string SetQuantity(Product product)
         {
 
             var number = client.AskForNumber($"How many {product.Name}'s do you want to purchase?");
             if (number < 1)
             {
-                
+
                 return ShowAbortOperationMessage("Operation was canceled");
-                 
+
             }
 
             if (context.Cart is null)
@@ -154,7 +96,59 @@ namespace ConsoleEShop.Pages
                 context.Cart.Items.Add(cartItem);
             }
             return ShowWelcomeInfo("Item added to cart");
-            
+
+        }
+    }
+
+    public abstract partial class BasePage
+    {
+        public EShop context;
+
+        protected readonly IDataService dataService;
+        protected readonly IClient client;
+
+        public Dictionary<string, Func<string>> Commands { get; set; }
+        public string Param { get; set; }
+        protected BasePage(IDataService dataService, IClient client)
+        {
+            this.dataService = dataService;
+            this.client = client;
+        }
+
+        public abstract IView ShowPageData();
+        public abstract void SetCommands();
+        public void SetContext(EShop context)
+        {
+            this.context = context;
+            SetCommands();
+        }
+
+        public string ShowWelcomeInfo(string message = null)
+        {
+            var menu = new MenuView(context, Commands.Keys.ToList());
+            return new PageData(menu, ShowPageData()).ShowViewData() + $"\n{message}";
+        }
+
+        public string ShowAbortOperationMessage(string message)
+        {
+            return ShowPageData().ShowViewData() + $"\n{message}";
+        }
+
+        //Page transitions
+        public string ShowMyOrdersPage()
+        {
+            context.SetCurrentPage(new OrdersPage(dataService, client));
+            return context.currentPage.ShowPageData().ShowViewData();
+        }
+        public string ShowMyCartPage()
+        {
+            context.SetCurrentPage(new CartPage(dataService, client));
+            return context.currentPage.ShowPageData().ShowViewData();
+        }
+        public string ShowAllProductsPage()
+        {
+            context.SetCurrentPage(new ProductsPage(dataService, client));
+            return ShowWelcomeInfo();
         }
         public string ShowProductPage(string name = null)
         {
@@ -173,54 +167,31 @@ namespace ConsoleEShop.Pages
             var product = dataService.GetProductByName(name);
             if (product is null)
             {
-               return ShowAbortOperationMessage("Can't find this product");
-                 
+                return ShowAbortOperationMessage("Can't find this product");
+
             }
-            context.SetCurrentPage(new ProductPage(ioService, dataService, product, client));
+            context.SetCurrentPage(new ProductPage(dataService, product, client));
             return ShowWelcomeInfo();
         }
-    }
-
-    public abstract partial class BasePage
-    {
-
-        public EShop context;
-        protected readonly IIOService ioService;
-        protected readonly IDataService dataService;
-        protected readonly IClient client;
-
-        
-
-        public Dictionary<string, Func<string>> Commands { get; set; }
-        public string Param { get; set; }
-        protected BasePage(IIOService ioService, IDataService dataService, IClient client)
+        public string ShowMyInfoPage()
         {
-            
-            this.ioService = ioService;
-            this.dataService = dataService;
-            this.client = client;
-            
+            context.SetCurrentPage(new PersonalInfoPage(dataService, client));
+            return context.currentPage.ShowPageData().ShowViewData();
         }
-
-
-        public abstract IView ShowPageData();
-        public abstract void SetCommands();
-        public void SetContext(EShop context)
+        public string ShowManageUsersPage()
         {
-            this.context = context;
-            SetCommands();
+            context.SetCurrentPage(new UserManagementPage(dataService, client));
+            return context.currentPage.ShowPageData().ShowViewData();
         }
-
-        public string ShowWelcomeInfo(string message = null)
+        public string ShowManageProductsPage()
         {
-            var menu = new MenuView(context, Commands.Keys.ToList());
-            return new PageData(menu, ShowPageData()).ShowViewData() +$"\n{message}";
+            context.SetCurrentPage(new ProductsManagamentPage(dataService, client));
+            return context.currentPage.ShowPageData().ShowViewData();
         }
-
-        public string ShowAbortOperationMessage(string message)
+        public string ShowManageOrdersPage()
         {
-            return ShowPageData().ShowViewData() + $"\n{message}";
+            context.SetCurrentPage(new OrdersManagamentPage(dataService, client));
+            return context.currentPage.ShowPageData().ShowViewData();
         }
-
     }
 }

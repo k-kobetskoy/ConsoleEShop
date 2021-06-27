@@ -14,13 +14,13 @@ namespace Console.EShop.UnitTests
         [SetUp]
         public void Setup()
         {
-            var ioService = new Mock<IIOService>();
+           
             var dataService = new Mock<IDataService>();
             var client = new Mock<IClient>();
 
            
 
-            eShop = new ConsoleEShop.EShop(ioService.Object, dataService.Object, client.Object);
+            eShop = new ConsoleEShop.EShop(dataService.Object, client.Object);
         }
 
         [Test]

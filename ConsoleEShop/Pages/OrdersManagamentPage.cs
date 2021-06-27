@@ -9,7 +9,7 @@ namespace ConsoleEShop.Pages
     class OrdersManagamentPage : BasePage, IPage
     {
         private List<Order> Orders { get; set; }
-        public OrdersManagamentPage(IIOService ioService, IDataService dataService, IClient client) : base(ioService, dataService, client)
+        public OrdersManagamentPage( IDataService dataService, IClient client) : base( dataService, client)
         {
             
         }
@@ -59,12 +59,12 @@ namespace ConsoleEShop.Pages
                 
             }
 
-            ioService.Highlight("Please enter № of status :");
+            client.Write("Please enter № of status :");
 
-            ioService.Write($"{01} - {OrderStatus.CanceledByAdministrator}");
-            ioService.Write($"{02} - {OrderStatus.PaymentRecieved}");
-            ioService.Write($"{03} - {OrderStatus.Sent}");
-            ioService.Write($"{04} - {OrderStatus.Finished}");
+            client.Write($"{01} - {OrderStatus.CanceledByAdministrator}");
+            client.Write($"{02} - {OrderStatus.PaymentRecieved}");
+            client.Write($"{03} - {OrderStatus.Sent}");
+            client.Write($"{04} - {OrderStatus.Finished}");
 
             var newStatusNo = client.AskForNumber("Please enter No of new status", 4);
 

@@ -12,7 +12,7 @@ namespace ConsoleEShop.Pages
     {
         private readonly List<Product> products;
        
-        public ProductsPage(IIOService ioService, IDataService dataService, IClient client) : base(ioService, dataService,client)
+        public ProductsPage( IDataService dataService, IClient client) : base( dataService,client)
         {
             products = dataService.GetProducts().ToList();
             

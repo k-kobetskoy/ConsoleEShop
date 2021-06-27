@@ -12,7 +12,7 @@ namespace ConsoleEShop.Pages
     {
 
 
-        public CartPage(IIOService ioService, IDataService dataService, IClient client) : base(ioService, dataService, client)
+        public CartPage( IDataService dataService, IClient client) : base(dataService, client)
         {
         }
 
